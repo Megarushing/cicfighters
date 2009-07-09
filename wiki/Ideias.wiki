@@ -1,0 +1,12 @@
+#summary Postem ideias aqui
+
+= Introduction =
+
+Coloquem ideias, frases de vitoria e projeteis que gostariam de ver implementados aqui nesta wiki.
+
+
+= Details =
+
+- Fazer o sting do Gondim puxar o jogador, como o scorpion.
+
+- Frase pro ladeira: "Esse negocio de internet nunca vai pegar"
