@@ -2,6 +2,7 @@ import os,sys
 import pygame
 from pygame.locals import *
 from Sprite import *
+import Personagem
 import random
 
 class Ringue(object):
@@ -27,12 +28,12 @@ class Ringue(object):
         pygame.mixer.music.load(os.path.join('.','Musicas','Normais',self.musicaescolhida))
         pygame.mixer.music.set_volume(0.1)
         pygame.mixer.music.play(-1)
-        self.p1 = Player(self.nomes[0],(self.screenwidth/4,self.screenheight - 380),controlesp1)
-        self.p2 = Player(self.nomes[1],(((self.screenwidth/4)*3)-120,self.screenheight - 380),controlesp2)
+        self.p1 = Player(self.nomes[0],(self.screenwidth//4,self.screenheight - 380),controlesp1)
+        self.p2 = Player(self.nomes[1],(((self.screenwidth//4)*3)-120,self.screenheight - 380),controlesp2)
         self.p1.adversario = self.p2
         self.p2.adversario = self.p1
-        self.barrap1 = Barra((self.screenwidth/16,self.screenheight/16),(self.screenwidth/2)-(self.screenwidth/8),self.screenheight/32,self.p1,True)
-        self.barrap2 = Barra(((self.screenwidth/2)+(self.screenwidth/16),self.screenheight/16),(self.screenwidth/2)-(self.screenwidth/8),self.screenheight/32,self.p2,False)
+        self.barrap1 = Barra((self.screenwidth//16,self.screenheight//16),(self.screenwidth//2)-(self.screenwidth//8),self.screenheight//32,self.p1,True)
+        self.barrap2 = Barra(((self.screenwidth//2)+(self.screenwidth//16),self.screenheight//16),(self.screenwidth//2)-(self.screenwidth//8),self.screenheight//32,self.p2,False)
         self.sangues = []
         self.momentotenso = False
         self.vitoria = False
@@ -177,45 +178,39 @@ class Ringue(object):
 
 class Player(object):
     """ Classe que define um jogador (lutador na tela) """
-    def __init__(self,nome,(x,y),controles):
+    def __init__(self,nome,pos,controles):
+        x,y = pos
         self.screenwidth = pygame.display.get_surface().get_width()
         self.adversario = self
         self.nome = nome
         self.x = x
         self.y = y
         self.yinicial = y
-        self.projetil = Projetil(os.path.join('.','Personagens',self.nome,'projetil.png'))
-        self.animacoes = {"parado":Sprite(os.path.join('.','Personagens',self.nome,'parado.png'),(305,320),8),
-                          "andando":Sprite(os.path.join('.','Personagens',self.nome,'andando.png'),(305,320),8),
-                          "pulando":Sprite(os.path.join('.','Personagens',self.nome,'pulando.png'),(305,320),8),
-                          "abaixado":Sprite(os.path.join('.','Personagens',self.nome,'abaixado.png'),(305,320),8),
-                          "socando":Sprite(os.path.join('.','Personagens',self.nome,'socando.png'),(305,320),15),
-                          "socando-abaixado":Sprite(os.path.join('.','Personagens',self.nome,'socando-abaixado.png'),(305,320),10),
-                          "socando-pulando":Sprite(os.path.join('.','Personagens',self.nome,'socando-pulando.png'),(305,320),8),
-                          "chutando":Sprite(os.path.join('.','Personagens',self.nome,'chutando.png'),(305,320),8),
-                          "chutando-abaixado":Sprite(os.path.join('.','Personagens',self.nome,'chutando-abaixado.png'),(305,320),8),
-                          "chutando-pulando":Sprite(os.path.join('.','Personagens',self.nome,'chutando-pulando.png'),(305,320),8),
-                          "golpeado":Sprite(os.path.join('.','Personagens',self.nome,'golpeado.png'),(305,320),8),
-                          "defesa":Sprite(os.path.join('.','Personagens',self.nome,'defesa.png'),(305,320),8),
-                          "defesa-abaixado":Sprite(os.path.join('.','Personagens',self.nome,'defesa-abaixado.png'),(305,320),8),
-                          "morrendo":Sprite(os.path.join('.','Personagens',self.nome,'morrendo.png'),(320,320),5),
-                          "especial":Sprite(os.path.join('.','Personagens',self.nome,'especial.png'),(305,320),8),
-                          "especial-abaixado":Sprite(os.path.join('.','Personagens',self.nome,'especial-abaixado.png'),(305,320),8)}
+        self.projetil = Projetil(Personagem.arquivo(self.nome,'projetil.png'))
+        self.animacoes = {"parado":Sprite(Personagem.arquivo(self.nome,'parado.png'),(305,320),8),
+                          "andando":Sprite(Personagem.arquivo(self.nome,'andando.png'),(305,320),8),
+                          "pulando":Sprite(Personagem.arquivo(self.nome,'pulando.png'),(305,320),8),
+                          "abaixado":Sprite(Personagem.arquivo(self.nome,'abaixado.png'),(305,320),8),
+                          "socando":Sprite(Personagem.arquivo(self.nome,'socando.png'),(305,320),15),
+                          "socando-abaixado":Sprite(Personagem.arquivo(self.nome,'socando-abaixado.png'),(305,320),10),
+                          "socando-pulando":Sprite(Personagem.arquivo(self.nome,'socando-pulando.png'),(305,320),8),
+                          "chutando":Sprite(Personagem.arquivo(self.nome,'chutando.png'),(305,320),8),
+                          "chutando-abaixado":Sprite(Personagem.arquivo(self.nome,'chutando-abaixado.png'),(305,320),8),
+                          "chutando-pulando":Sprite(Personagem.arquivo(self.nome,'chutando-pulando.png'),(305,320),8),
+                          "golpeado":Sprite(Personagem.arquivo(self.nome,'golpeado.png'),(305,320),8),
+                          "defesa":Sprite(Personagem.arquivo(self.nome,'defesa.png'),(305,320),8),
+                          "defesa-abaixado":Sprite(Personagem.arquivo(self.nome,'defesa-abaixado.png'),(305,320),8),
+                          "morrendo":Sprite(Personagem.arquivo(self.nome,'morrendo.png'),(320,320),5),
+                          "especial":Sprite(Personagem.arquivo(self.nome,'especial.png'),(305,320),8),
+                          "especial-abaixado":Sprite(Personagem.arquivo(self.nome,'especial-abaixado.png'),(305,320),8)}
 
-        listasomsoco = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:4] == 'soco' and i[-4:] == '.wav']
-        self.somsoco = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasomsoco]
-        listasomchute = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:5] == 'chute' and i[-4:] == '.wav']
-        self.somchute = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasomchute]
-        listasomapanhando = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:9] == 'apanhando' and i[-4:] == '.wav']
-        self.somapanhando = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasomapanhando]
-        listasomdefesa = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:6] == 'defesa' and i[-4:] == '.wav']
-        self.somdefesa = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasomdefesa]
-        listasommorrendo = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:8] == 'morrendo' and i[-4:] == '.wav']
-        self.sommorrendo = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasommorrendo]
-        listasomcaindo = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:6] == 'caindo' and i[-4:] == '.wav']
-        self.somcaindo = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasomcaindo]        
-        listasomespecial = [i for i in os.listdir(os.path.join('.','Personagens',nome)) if i[:8] == 'especial' and i[-4:] == '.wav']
-        self.somespecial = [pygame.mixer.Sound(os.path.join('.','Personagens',nome,i)) for i in listasomespecial]  
+        self.somsoco = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'soco')]
+        self.somchute = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'chute')]
+        self.somapanhando = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'apanhando')]
+        self.somdefesa = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'defesa')]
+        self.sommorrendo = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'morrendo')]
+        self.somcaindo = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'caindo')]        
+        self.somespecial = [pygame.mixer.Sound(i) for i in Personagem.sons(nome,'especial')]  
         
         self.kcima = controles[0]
         self.kbaixo = controles[1]
@@ -549,8 +544,9 @@ class Projetil(object):
             else:
                 self.animacao.render(screen,(self.caixacolisao.left,self.caixacolisao.top-32),(0,0),True)
 
-    def disparar(self,(x,y),direita):
+    def disparar(self,pos,direita):
         """ realiza o disparo de um novo projetil """
+        x,y = pos
         self.direita = direita
         if direita: self.mult = 500
         else: self.mult = -500
@@ -562,8 +558,9 @@ class Projetil(object):
 
 class Sangue(object):
     """Classe para particulas de sangue"""
-    def __init__(self,(x,y),limitey,direita):
+    def __init__(self,pos,limitey,direita):
         """ Inicializa particula com velocidade aleatoria """
+        x,y = pos
         if direita: mult = +1
         else: mult = -1
 
@@ -599,8 +596,9 @@ class Sangue(object):
 
 class Barra(object):
     """Classe para barras de contagem de hp"""
-    def __init__(self,(x,y),width,height,jogador,invertida = False):
+    def __init__(self,pos,width,height,jogador,invertida = False):
         """ Inicializa barra de contagem """
+        x,y = pos
         self.nome = jogador.nome
         self.font = pygame.font.Font(os.path.join('.','Imagens',"fonte.ttf"),int(0.04*pygame.display.get_surface().get_height()))
         self.x = x
@@ -645,7 +643,7 @@ class Barra(object):
             self.corvermelho = 255
             self.inccorvermelho = -3
 
-        if (self.retanguloverde.width*self.inversor) <= (self.width/2):
+        if (self.retanguloverde.width*self.inversor) <= (self.width//2):
             self.tensao = int(60 - ((self.retanguloverde.width*self.inversor)/(self.width/2.)) * 50.)
 
         
@@ -670,14 +668,11 @@ class Vitoria(object):
         self.width = self.tela.get_width()
         self.height = self.tela.get_height()
         #Carrega personagem vitorioso e sua frase
-        self.foto = Sprite(os.path.join('.','Personagens', nome, "vs.png"),(0,0),False,(self.width*0.5,self.height*0.598333333))
-        arqfrases = open(os.path.join('.','Personagens', nome, "frases.txt"))
-        frases = arqfrases.readlines()
+        self.foto = Sprite(Personagem.arquivo(nome, "vs.png"),(0,0),False,(self.width*0.5,self.height*0.598333333))
+        arqfrases = open(Personagem.arquivo(nome, "frases.txt"), encoding="latin-1")
+        frases = [linha.strip() for linha in arqfrases.readlines() if linha.strip()]
         arqfrases.close()
-        if sys.platform[:-2] == "win":
-            self.frase = "  "+random.choice(frases)[:-1]+"  "
-        else:
-            self.frase = "  "+random.choice(frases)[:-2]+"  "
+        self.frase = "  "+random.choice(frases)+"  "
         self.player = player
         self.y = (self.height * 0.41)
         #Player 1 vai da esquerda para a direita

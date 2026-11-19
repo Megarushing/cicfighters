@@ -1,9 +1,5 @@
-from distutils.core import setup
-import py2exe
-import sys
+from py2exe import freeze
 
-sys.argv.append("py2exe")
-
-setup(windows=[{'script': 'cicfighters.py', 'icon_resources': [(1, "cicfighters-large.ico")]}],
-     options = {'py2exe': {'optimize': 1, 'bundle_files':1} },
-     zipfile=None)
+freeze(windows=[{"script": "cicfighters.py", "icon_resources": [(1, "cicfighters-large.ico")]}],
+       options={"optimize": 1, "bundle_files": 1, "compressed": True},
+       zipfile=None)

@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 
 from Sprite import *
+import Personagem
       
 class VersusScreen():
     """Classe da tela de versus"""
@@ -23,10 +24,10 @@ class VersusScreen():
         self.fundo = Sprite(os.path.join('.','Imagens', "vsback.png"),(0,0),False,(self.width,self.height))
 
         #Carrega personagem player 1
-        self.player1 = Sprite(os.path.join('.','Personagens', self.jogadores[0], "vs.png"),(0,0),False,(self.width*0.5,self.height*0.598333333))
+        self.player1 = Sprite(Personagem.arquivo(self.jogadores[0], "vs.png"),(0,0),False,(self.width*0.5,self.height*0.598333333))
 
         #Carrega personagem player 2
-        self.player2 = Sprite(os.path.join('.','Personagens', self.jogadores[1], "vs.png"),(0,0),False,(self.width*0.5,self.height*0.598333333))
+        self.player2 = Sprite(Personagem.arquivo(self.jogadores[1], "vs.png"),(0,0),False,(self.width*0.5,self.height*0.598333333))
         
     def update(self, dtempo, eventos):
         """Atualiza a tela de versus"""

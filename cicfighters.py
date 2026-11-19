@@ -15,7 +15,7 @@
 #/*                                                          */
 #/*    P2                                                    */
 #/*    movimento: Cima, baixo, esquerda e direita            */
-#/*    botoes: NUM7 - soco, NUM8 - chute, NUM9 - especial    */
+#/*    botoes: 7 - soco, NUM8 - chute, NUM9 - especial       */
 #/*                                                          */
 #/*    ESC para sair                                         */
 #/*                                                          */
@@ -27,11 +27,11 @@ from GameEngine import *
 
 def usage():
     """Imprime informacoes de uso"""
-    print "Uso: cicfighter.py"
-    print
-    print "Opcoes:"
-    print "  -f | --fullscreen       : Modo em tela cheia"
-    print "  -h | --help             : Esta tela"
+    print("Uso: cicfighter.py")
+    print()
+    print("Opcoes:")
+    print("  -f | --fullscreen       : Modo em tela cheia")
+    print("  -h | --help             : Esta tela")
 
 if __name__ == "__main__":
     try:

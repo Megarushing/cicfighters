@@ -1,18 +1,46 @@
-Versão 1.0pre - Pre release, por favor reportem bugs
+CiC Fighters - jogo de luta com os professores do CIC/UnB
 
-Modo janela por padrão, para iniciar em fullscreen executar cicfighter.exe -f
+Requisitos: Python 3 e pygame 2
+  pip install -r requirements.txt
+  python cicfighters.py          (modo janela)
+  python cicfighters.py -f       (tela cheia)
+Ou, com uv:
+  uv run --with pygame python cicfighters.py
 
-Para executar direto do source code ou rodar em linux/mac instale
-o python 2.5 e o pygame para python 2.5 contidos na pasta
-"Dependencias" da svn ou via apt-get e execute: python cicfighters.py
+Teclas gerais:
+  ESC   - retorna ou sai do jogo
+  Enter - alterna tela cheia (no menu e na luta)
+  F1/F2 - reconfigura os controles do P1/P2 (no menu)
 
-ESC - Retorna ou sai do jogo
+Controles padrão:
+  P1: movimento w, a, s, d    | y - soco, u - chute, i - especial
+  P2: movimento setas         | 7 - soco, NUM8 - chute, NUM9 - especial
+  (P2 sem teclado numérico: aperte F2 no menu e escolha outras teclas)
 
-controles padrão (podem ser mudados com F1 e F2):
-P1
-movimento: w, a, s, d
-botoes: y - soco, u - chute, i - especial
+Como jogar:
+  1. Na tela "Faça Sua Matrícula" cada jogador move o cursor (P1 vermelho,
+     P2 azul) e confirma o personagem com o botão de soco. Chute desfaz.
+  2. Quando os dois confirmam, aparece a tela de versus. Aperte Enter ou
+     qualquer botão de ataque para começar a luta.
 
-P2
-movimento: Cima, baixo, esquerda e direita
-botoes: NUM7 - soco, NUM8 - chute, NUM9 - especial
+Menu de seleção:
+  Os personagens ficam em páginas. Mova o cursor para cima/baixo para
+  trocar de página; a página mostrada segue o último jogador que se moveu.
+  A barra lateral mostra a página atual e a de cada jogador.
+
+Personagens:
+  Os personagens são os docentes listados em https://cic.unb.br/docentes/
+  Cada um tem uma pasta em Personagens/ com:
+    retrato.png - foto do menu (90x120)
+    nome.txt    - nome completo
+    corpo.txt   - qual pasta de Corpos/ fornece animações, sons, vs.png e
+                  frases de vitória
+  Qualquer arquivo colocado na pasta do personagem (ex.: frases.txt ou
+  vs.png) substitui o do corpo. Para adicionar alguém, crie a pasta com
+  retrato.png e corpo.txt.
+
+  Corpos/ guarda os personagens originais do jogo (animações e vozes).
+  As artes-fonte (PSDs) estão em PSDs/ e os modelos em Templates/.
+
+Gerar executável Windows (py2exe):
+  python compilar.py

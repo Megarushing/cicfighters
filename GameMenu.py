@@ -3,10 +3,11 @@ import os,sys
 import pygame
 from pygame.locals import *
 from Sprite import *
+import Personagem
 
 class GameMenu(object):
     """Menu de escolha de personagens"""
-    def __init__(self,jogadores = ["","",[pygame.K_w,pygame.K_s,pygame.K_a,pygame.K_d,pygame.K_y,pygame.K_u,pygame.K_i],[pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_KP7,pygame.K_KP8,pygame.K_KP9]]):
+    def __init__(self,jogadores = ["","",[pygame.K_w,pygame.K_s,pygame.K_a,pygame.K_d,pygame.K_y,pygame.K_u,pygame.K_i],[pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT,pygame.K_7,pygame.K_KP8,pygame.K_KP9]]):
         self.inicializa(jogadores)
         
     def inicializa(self,jogadores):
@@ -25,28 +26,33 @@ class GameMenu(object):
         self.cor = 120
         self.incrcor = 3
         self.configcontrole = 0
-        #define posicoes dos retratos na tela
-        for i in [string for string in os.listdir(os.path.join('.','Personagens')) if not string.startswith(".")]:
-            x = pos[0]
-            y = pos[1]
-            linha.append(Retrato(i,(x,y)))
+        #define posicoes dos retratos na tela, divididos em paginas
+        ytopo = pos[1]
+        self.linhasporpagina = 0
+        for i in Personagem.listar():
+            linha.append(Retrato(i,(pos[0],pos[1])))
             pos[0] = pos[0] + 120
             if (pos[0]+90) >= self.width:
-                pos[1] = pos[1] + 160
                 pos[0] = self.width*0.2375
-                retratos.append(linha[:])
+                retratos.append(linha)
                 linha = []
-                #se o numero de personagens ultrapassa o limite de tamanho da tela para de ler
+                pos[1] = pos[1] + 160
+                #quando a proxima linha nao cabe na tela, ela vai para uma nova pagina
                 if (pos[1] + 120) >= self.height:
-                    break
+                    if not self.linhasporpagina: self.linhasporpagina = len(retratos)
+                    pos[1] = ytopo
 
-        if len(linha) > 0: retratos.append(linha[:])
+        if len(linha) > 0: retratos.append(linha)
+        if not self.linhasporpagina: self.linhasporpagina = len(retratos)
         self.retratos = retratos
+        self.numpaginas = (len(retratos) + self.linhasporpagina - 1) // self.linhasporpagina
+        self.pagina = 0
+        self.fontepagina = pygame.font.Font(os.path.join('.','Imagens',"fonte.ttf"), int(self.height*0.03))
         self.retratos[0][0].seleciona(1)
         self.retratos[0][0].seleciona(2)
         self.selecionadop1 = [0,0]
         self.selecionadop2 = [0,0]
-        self.numcolunas = int((self.width-50)/120)
+        self.numcolunas = (self.width-50)//120
         self.fundo = Sprite(os.path.join('.','Imagens','menu.png'),(0,0),0,(self.width,self.height))
         self.botoesp1 = jogadores[2]
         self.botoesp2 = jogadores[3]
@@ -169,37 +175,53 @@ class GameMenu(object):
             if self.retratos[self.selecionadop1[1]][self.selecionadop1[0]].escolhidop1 and self.retratos[self.selecionadop2[1]][self.selecionadop2[0]].escolhidop2:
                 return [self.retratos[self.selecionadop1[1]][self.selecionadop1[0]].nome,self.retratos[self.selecionadop2[1]][self.selecionadop2[0]].nome,self.botoesp1,self.botoesp2]
             else:
-                return self.input(eventos)
+                antesp1 = self.selecionadop1[:]
+                antesp2 = self.selecionadop2[:]
+                retorno = self.input(eventos)
+                #a pagina mostrada acompanha o ultimo jogador que moveu o cursor
+                if self.selecionadop1 != antesp1:
+                    self.pagina = self.selecionadop1[1] // self.linhasporpagina
+                elif self.selecionadop2 != antesp2:
+                    self.pagina = self.selecionadop2[1] // self.linhasporpagina
+                return retorno
 
     def render(self,screen):
         """Renderiza os elementos da tela atual"""
         self.fundo.render(screen,(0,0))
-        screen.blit(self.font.render("Fa�a Sua Matr�cula", True, (self.cor,0,0)),(self.postitulo[0],self.postitulo[1]))
-        for i in self.retratos:
+        screen.blit(self.font.render("Faça Sua Matrícula", True, (self.cor,0,0)),(self.postitulo[0],self.postitulo[1]))
+        inicio = self.pagina * self.linhasporpagina
+        for i in self.retratos[inicio:inicio + self.linhasporpagina]:
             for n in i:
                 n.render(screen)
+
+        #indicador de paginas na barra lateral
+        if self.numpaginas > 1:
+            x = self.width*0.025
+            screen.blit(self.fontepagina.render("Página %d/%d" % (self.pagina+1, self.numpaginas), True, (60,60,60)),(x,self.height*0.895))
+            screen.blit(self.fontepagina.render("P1: pág. %d" % (self.selecionadop1[1]//self.linhasporpagina+1), True, (200,0,0)),(x,self.height*0.925))
+            screen.blit(self.fontepagina.render("P2: pág. %d" % (self.selecionadop2[1]//self.linhasporpagina+1), True, (0,0,200)),(x,self.height*0.955))
 
         if self.configcontrole:
             superficieescura = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             superficieescura.fill((0,0,0,210))
             screen.blit(superficieescura,(0,0))
-            screen.blit(self.font.render("Configurando Controles:", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Configurando Controles:")[0]/2),self.height*0.1))
-            screen.blit(self.font.render("Pressione:", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Pressione:")[0]/2),self.height*0.4))
+            screen.blit(self.font.render("Configurando Controles:", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Configurando Controles:")[0]//2),self.height*0.1))
+            screen.blit(self.font.render("Pressione:", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Pressione:")[0]//2),self.height*0.4))
             
             if self.configcontrole == 1:
-                screen.blit(self.font.render("Jogador 1", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Jogador 1")[0]/2),self.height*0.2))
+                screen.blit(self.font.render("Jogador 1", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Jogador 1")[0]//2),self.height*0.2))
                 listabotoes = self.botoesp1
             elif self.configcontrole == 2:
-                screen.blit(self.font.render("Jogador 2", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Jogador 2")[0]/2),self.height*0.2))
+                screen.blit(self.font.render("Jogador 2", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Jogador 2")[0]//2),self.height*0.2))
                 listabotoes = self.botoesp2
 
-            if len(listabotoes) == 0: screen.blit(self.font.render("Cima", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Cima")[0]/2),self.height*0.5))
-            elif len(listabotoes) == 1: screen.blit(self.font.render("Baixo", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Baixo")[0]/2),self.height*0.5))
-            elif len(listabotoes) == 2: screen.blit(self.font.render("Esquerda", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Esquerda")[0]/2),self.height*0.5))
-            elif len(listabotoes) == 3: screen.blit(self.font.render("Direita", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Direita")[0]/2),self.height*0.5))
-            elif len(listabotoes) == 4: screen.blit(self.font.render("Soco", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Soco")[0]/2),self.height*0.5))
-            elif len(listabotoes) == 5: screen.blit(self.font.render("Chute", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Chute")[0]/2),self.height*0.5))
-            elif len(listabotoes) == 6: screen.blit(self.font.render("Especial", True, (self.cor,0,0)),((self.width/2)-(self.font.size("Especial")[0]/2),self.height*0.5))                
+            if len(listabotoes) == 0: screen.blit(self.font.render("Cima", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Cima")[0]//2),self.height*0.5))
+            elif len(listabotoes) == 1: screen.blit(self.font.render("Baixo", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Baixo")[0]//2),self.height*0.5))
+            elif len(listabotoes) == 2: screen.blit(self.font.render("Esquerda", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Esquerda")[0]//2),self.height*0.5))
+            elif len(listabotoes) == 3: screen.blit(self.font.render("Direita", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Direita")[0]//2),self.height*0.5))
+            elif len(listabotoes) == 4: screen.blit(self.font.render("Soco", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Soco")[0]//2),self.height*0.5))
+            elif len(listabotoes) == 5: screen.blit(self.font.render("Chute", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Chute")[0]//2),self.height*0.5))
+            elif len(listabotoes) == 6: screen.blit(self.font.render("Especial", True, (self.cor,0,0)),((self.width//2)-(self.font.size("Especial")[0]//2),self.height*0.5))                
             
 
     def unload(self,):
@@ -211,10 +233,9 @@ class GameMenu(object):
 
 class Retrato(object):
     """ Retrato de personagem na tela de selecao """
-    def __init__(self,nome,(x,y)):
-        self.sprite = Sprite(os.path.join('.','Personagens',nome,'retrato.png'),(90,120),1.5)
-        self.x = x
-        self.y = y
+    def __init__(self,nome,pos):
+        self.sprite = Sprite(Personagem.arquivo(nome,'retrato.png'),(90,120),1.5)
+        self.x,self.y = pos
         self.nome = nome
         self.font = pygame.font.Font(os.path.join('.','Imagens',"fonte.ttf"), 20)
         self.selecionadop1 = False
@@ -224,7 +245,7 @@ class Retrato(object):
         self.cor = 155
         self.incrcor = 5
         self.somseleciona = pygame.mixer.Sound(os.path.join('.','Sons',"seleciona.wav"))
-        self.somescolhejogador = pygame.mixer.Sound(os.path.join('.',"Personagens",self.nome,"escolhe.wav"))
+        self.somescolhejogador = pygame.mixer.Sound(Personagem.arquivo(self.nome,"escolhe.wav"))
         self.somescolhe = pygame.mixer.Sound(os.path.join('.',"Sons","escolhe.wav"))
 
     def update(self,dtempo):
@@ -239,7 +260,7 @@ class Retrato(object):
     def render(self,screen):
         """ Renderiza retrato e caixa de selecao """
         self.sprite.render(screen,(self.x,self.y))
-        screen.blit(self.font.render(self.nome, True, (155,0,0)),(self.x+45-(self.font.size(self.nome)[0]/2),self.y + 130))
+        screen.blit(self.font.render(self.nome, True, (155,0,0)),(self.x+45-(self.font.size(self.nome)[0]//2),self.y + 130))
         if (not self.escolhidop1) and (not self.escolhidop2):
             if self.selecionadop1:
                 pygame.draw.rect(screen, (self.cor,0,0), pygame.Rect(self.x-5,self.y-5,95,125), 5)
